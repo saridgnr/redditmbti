@@ -1,0 +1,4 @@
+-s INTJ -s INFJ -s ISFJ -s ISTJ
+-s ISTP -s ISFP -s INFP -s INTP
+-s ESTP	-s ESFP	-s ENFP	-s ENTP
+-s ESTJ	-s ESFJ	-s ENFJ	-s ENTJ
