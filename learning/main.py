@@ -1,4 +1,3 @@
-import spacy as sp
 import pandas as pd
 import numpy as np
 import spacy as sp
@@ -7,14 +6,6 @@ from torch import nn
 from torch import optim
 import random
 import torch.nn.functional as F
-from sklearn import preprocessing
-import sklearn.metrics.pairwise as pairwise
-from datetime import datetime, date, time
-import re
-import codecs
-from sklearn.metrics import accuracy_score
-from collections import Counter
-import string
 from random import shuffle
 from sklearn.metrics import precision_recall_fscore_support
 
