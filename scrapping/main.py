@@ -46,7 +46,7 @@ def write_post_data(data_file, post):
         relevant_data = [
             str(post.score),
             post.title,
-            post.selftext.replace('\n', '\\n')
+            post.selftext.replace('\n', '\\n').replace('\t', ' ')
         ]
         data_file.write('\t'.join(relevant_data) + '\n')
 
@@ -55,7 +55,7 @@ def write_comment_data(data_file, comment):
     if isinstance(comment, Comment):
         relevant_data = [
             str(comment.score),
-            comment.body.replace('\n', '\\n')
+            comment.body.replace('\n', '\\n').replace('\t', ' ')
         ]
         data_file.write('\t'.join(relevant_data) + '\n')
 
