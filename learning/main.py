@@ -13,11 +13,20 @@ from emo_model import EmoModel
 from vocab import Vocab
 
 MAX_LENGTH = 100
+PERSONALITY = "personality"
+REDDIT_SCORE = "reddit_score"
+CONTENT_1 = "content_1"
+CONTENT_2 = "content_2"
+
 nlp = sp.load('en')
 
 
 def main():
-    data = pd.read_csv("ISIS Religious Texts v1.csv", encoding='ISO-8859-1')
+    data = pd.read_csv(r"D:\Users\White\Desktop\Code\colman\NLP\redditMBTI\scrapping\data_100\mbti.tsv",
+                       sep="\t",
+                       header=None,
+                       names=[PERSONALITY, REDDIT_SCORE, CONTENT_1, CONTENT_2],
+                       encoding='UTF-8')
     data.head()
 
     vocab = Vocab()
@@ -69,20 +78,22 @@ def main():
 def build_dataset(data, vocab):
     instances = []
     for index, row in data.iterrows():
-        text = row['Quote']
-        if isinstance(text, str):
-            proc_text = nlp(text.strip().lower())
-            if len(proc_text) > MAX_LENGTH:
-                continue
-            indexes = []
-            words = [t.text for t in proc_text]
-            indexes = vocab.index_document(words)
-            if len(indexes) < 4:
-                continue
-            tag_id = vocab.get_tag_id(row["Type"])
-            input_var = torch.LongTensor(indexes).cuda()
-            target_var = torch.LongTensor([int(tag_id)]).cuda()
-            instances.append((input_var, target_var))
+        for content in {CONTENT_1, CONTENT_2}:
+            text = row.get(content, None)
+            if isinstance(text, str):
+                proc_text = nlp(text.strip().lower())
+                if len(proc_text) > MAX_LENGTH:
+                    continue
+                indexes = []
+                words = [t.text for t in proc_text]
+                indexes = vocab.index_document(words)
+                if len(indexes) < 4:
+                    continue
+                personality_id = vocab.get_tag_id(row[PERSONALITY])
+                input_var = torch.LongTensor(indexes).cuda()
+                target_var = torch.LongTensor([int(personality_id)]).cuda()
+                instances.append((input_var, target_var))
+
     return instances
 
 
@@ -106,6 +117,7 @@ def eval(model, test):
         y_predicted.append(np.argmax(F.softmax(output).cpu().detach().numpy()))
         y_true.append(target_var.cpu().numpy()[0])
     return precision_recall_fscore_support(y_true, y_predicted, average='weighted')
+
 
 if __name__ == "__main__":
     main()
