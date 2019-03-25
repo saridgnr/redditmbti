@@ -13,6 +13,7 @@ from emo_model import EmoModel
 from vocab import Vocab
 
 MAX_LENGTH = 500
+MODEL_FILE_NAME = "model.pth"
 PERSONALITY = "personality"
 REDDIT_SCORE = "reddit_score"
 CONTENT_1 = "content_1"
@@ -22,7 +23,7 @@ nlp = sp.load('en', disable=["tagger", "parser", "ner"])
 
 
 def main():
-    data = pd.read_csv(r"D:\Users\White\Desktop\Code\colman\NLP\redditMBTI\scrapping\redditMBTIBig.tsv",
+    data = pd.read_csv(r"D:\Users\White\Desktop\Code\colman\NLP\redditMBTI\scrapping\redditMBTISmall.tsv",
                        sep="\t",
                        header=None,
                        names=[PERSONALITY, REDDIT_SCORE, CONTENT_1, CONTENT_2],
@@ -43,18 +44,18 @@ def main():
     n_layers = 2
     hidden_size = 800
     embedding_size = 300
-    if not path.exists("model.pth"):
+    if not path.exists(MODEL_FILE_NAME):
         model = EmoModel(vocab.word_count, hidden_size, embedding_size, vocab.tag_count, n_layers).cuda()
     else:
         print("model found! loading...")
-        torch.load("model.pth")
+        model = torch.load(MODEL_FILE_NAME)
     criterion = nn.CrossEntropyLoss()
     learning_rate = 0.0001
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     n_epochs = 1000000
     print_every = 30
     sample_every = 50
-    eval_every = 2500
+    eval_every = 60000
     loss = 0
     for e in range(1, n_epochs + 1):
         pair = random.choice(train)
@@ -111,7 +112,7 @@ def train_sentence(sentence, target, criterion, model, optimizer):
 
 def eval(model, test):
     print("saving the model")
-    torch.save(model, "model.pth")
+    torch.save(model, MODEL_FILE_NAME)
     print("evaluate the model")
     y_true = []
     y_predicted = []
