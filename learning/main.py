@@ -50,31 +50,39 @@ def main():
         print("model found! loading...")
         model = torch.load(MODEL_FILE_NAME)
     criterion = nn.CrossEntropyLoss()
-    learning_rate = 0.0001
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-    n_epochs = 1000000
-    print_every = 30
-    sample_every = 50
-    eval_every = 60000
-    loss = 0
-    for e in range(1, n_epochs + 1):
-        pair = random.choice(train)
-        input_var = pair[0]
-        target_var = pair[1]
-        output, iter_loss = train_sentence(input_var, target_var, criterion, model, optimizer)
-        loss += iter_loss
+    optimizer = optim.Adam(model.parameters())
+    n_epochs = 3
+    print("Train data length {0}".format(len(train)))
+    for epoch in range(0, n_epochs):
+        loss = 0
+        print("Starting epoch: {0}".format(epoch))
+        for pair in train:
+            input_var, target_var = pair
+            output, iter_loss = train_sentence(input_var, target_var, criterion, model, optimizer)
+            loss += iter_loss
+        print("Loss: {0}".format(loss / len(train)))
+        eval(model, test)
 
-        if e % print_every == 0:
-            loss = loss / print_every
-            print('Epoch %d Current Loss = %.4f' % (e, loss))
-            loss = 0
-        if e % sample_every == 0:
-            print("Target:", target_var.cpu().numpy()[0])
-            print("Output:", np.argmax(F.softmax(output).cpu().detach().numpy()))
-        if e % eval_every == 0:
-            print("Eval:", eval(model, test))
 
-    eval(model, test)
+
+    # for e in range(1, n_epochs + 1):
+    #     pair = random.choice(train)
+    #     input_var = pair[0]
+    #     target_var = pair[1]
+    #     output, iter_loss = train_sentence(input_var, target_var, criterion, model, optimizer)
+    #     loss += iter_loss
+    #
+    #     if e % print_every == 0:
+    #         loss = loss / print_every
+    #         print('Epoch %d Current Loss = %.4f' % (e, loss))
+    #         loss = 0
+    #     if e % sample_every == 0:
+    #         print("Target:", target_var.cpu().numpy()[0])
+    #         print("Output:", np.argmax(F.softmax(output).cpu().detach().numpy()))
+    #     if e % eval_every == 0:
+    #         print("Eval:", eval(model, test))
+    #
+    # eval(model, test)
 
 
 def build_dataset(data, vocab):
@@ -102,11 +110,11 @@ def build_dataset(data, vocab):
 
 def train_sentence(sentence, target, criterion, model, optimizer):
     optimizer.zero_grad()
-    loss = 0
     output = model(sentence)
     loss = criterion(output.view(1, -1), target)
     loss.backward()
     optimizer.step()
+
     return output, loss.item()
 
 
