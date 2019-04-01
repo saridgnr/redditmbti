@@ -8,8 +8,8 @@ class Attn(nn.Module):
         super(Attn, self).__init__()
 
         self.hidden_size = hidden_size
-        self.lin = nn.Linear(self.hidden_size * 2, hidden_size * 2)
-        self.weight_vec = nn.Parameter(torch.FloatTensor(1, hidden_size * 2))
+        self.lin = nn.Linear(self.hidden_size * 2, hidden_size * 2).cuda()
+        self.weight_vec = nn.Parameter(torch.FloatTensor(1, hidden_size * 2).cuda())
 
     def forward(self, outputs):
         seq_len = len(outputs)

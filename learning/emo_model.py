@@ -4,15 +4,15 @@ from attn import Attn
 
 
 class EmoModel(nn.Module):
-    def __init__(self, input_size, hidden_size, embedding_size, output_size, n_layers):
+    def __init__(self, input_size, hidden_size, embedding_size, output_size, n_layers, dropout=0.1):
         super(EmoModel, self).__init__()
         self.hidden_size = hidden_size
         self.output_size = output_size
         self.n_layers = n_layers
-        self.embedding = nn.Embedding(input_size, embedding_size)
-        self.lstm = nn.LSTM(embedding_size, hidden_size, n_layers, bidirectional=True)
-        self.out = nn.Linear(hidden_size * 2, output_size)
-        self.attn = Attn(hidden_size)
+        self.embedding = nn.Embedding(input_size, embedding_size).cuda()
+        self.lstm = nn.LSTM(embedding_size, hidden_size, n_layers, bidirectional=True, dropout=dropout).cuda()
+        self.out = nn.Linear(hidden_size * 2, output_size).cuda()
+        self.attn = Attn(hidden_size).cuda()
 
     def forward(self, input_text):
         seq_len = len(input_text.data)
@@ -26,6 +26,7 @@ class EmoModel(nn.Module):
         weigthed_outputs = torch.mul(rnn_outputs, attn_weights)
         output = torch.sum(weigthed_outputs, -2)
         output = self.out(output)
+
         return output
 
     def init_hidden(self):
