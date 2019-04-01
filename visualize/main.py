@@ -1,0 +1,26 @@
+import matplotlib.pyplot as plt
+
+
+def main():
+    run_data_path = r"D:\Users\White\Desktop\Code\colman\NLP\redditMBTI\learning\1554079514.152244"
+    with open(run_data_path, "r") as f:
+        epochs_raw = {int(line.split(",", 1)[0]): line.split(",", 1)[1].rstrip() for line in f.readlines()}
+        epochs = {}
+        for num, data in epochs_raw.items():
+            epochs[num] = {}
+            epochs[num]["loss"] = float(data.split("|")[0])
+            for d in filter(None, data.split("|")[1:]):
+                epochs[num][d.split(":")[0]] = tuple(map(float, d.split(":")[1].split(",")[:-1]))
+    ordered_epochs = sorted(epochs.items(), key=lambda x: x[0])
+    #plt.plot([x[0] for x in ordered_epochs], [x[1]["loss"] for x in ordered_epochs])
+    #plt.plot([x[0] for x in ordered_epochs], [x[1]["EI"][0] for x in ordered_epochs])
+    #plt.plot([x[0] for x in ordered_epochs], [x[1]["EI"][1] for x in ordered_epochs])
+    #plt.plot([x[0] for x in ordered_epochs], [x[1]["EI"][2] for x in ordered_epochs])
+
+
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.show()
+
+if __name__== "__main__":
+    main()
