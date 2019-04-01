@@ -49,7 +49,7 @@ def main():
     n_layers = 2
     hidden_size = 800
     embedding_size = 300
-
+    print_progress_every = 30
     if not path.exists(MODEL_FILE_NAME):
         model = EmoModel(vocab.word_count, hidden_size, embedding_size, vocab.tag_count, n_layers).cuda()
     else:
@@ -62,7 +62,9 @@ def main():
     for epoch in range(0, n_epochs):
         loss = 0
         print("Starting epoch: {0}".format(epoch))
-        for pair in random.sample(train, epoch_size):
+        for i, pair in enumerate(random.sample(train, epoch_size)):
+            if i % print_progress_every == 0:
+                print("Training {0}/{1}".format(i, epoch_size))
             input_var, target_var = pair
             output, iter_loss = train_sentence(input_var, target_var, criterion, model, optimizer)
             loss += iter_loss
